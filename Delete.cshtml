@@ -1,0 +1,47 @@
+﻿@page
+@using System.Data.SqlClient;
+
+@{
+    String Id = Request.Query["Id"];
+    string connectionString = "Data Source=AMAN;Initial Catalog=mystore;Integrated Security=True";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Confirmation</title>
+</head>
+<body>
+    <h2>Delete Confirmation</h2>
+    <form method="post">
+        <input type="hidden" name="Id" value="@Id" />
+        <p>Are you sure you want to delete?</p>
+        <button type="submit" name="confirm" value="true">Yes</button>
+        <a href="/Clients/Index">No</a>
+    </form>
+
+    @if (Request.Method == "POST" && Request.Form["confirm"] == "true")
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "DELETE FROM clients WHERE Id=@Id";
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", Id);
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            Response.Redirect("/Clients/Index");
+        }
+        catch (Exception ex)
+        {
+            // Log or handle the exception (e.g., log to a file, display an error message)
+        }
+    }
+</body>
+</html>
